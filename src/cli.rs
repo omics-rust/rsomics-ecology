@@ -1,6 +1,7 @@
 use crate::alpha::{self, Metric};
 use crate::counts::Counts;
 use crate::phylogeny::{PreparedPhylogeny, RootMode};
+use crate::rarefy;
 use clap::{Args, Parser, Subcommand, ValueEnum};
 use rsomics_common::{OutputArgs, Result, RsomicsError, ThreadArgs, ToolMeta};
 use serde::Serialize;
@@ -29,6 +30,24 @@ struct Cli {
 enum Command {
     /// Compute selected per-sample alpha diversity metrics in one pass
     Alpha(Alpha),
+    /// Subsample each count-table sample without replacement
+    Rarefy(Rarefy),
+}
+
+#[derive(Args)]
+struct Rarefy {
+    /// Feature-by-sample integer TSV with feature or #OTU ID first header
+    #[arg(long, value_name = "TSV")]
+    counts: PathBuf,
+    /// Named canonical TSV destination; replaced atomically on success
+    #[arg(long, value_name = "PATH")]
+    output: PathBuf,
+    /// Required number of reads retained per sample; zero preserves dimensions
+    #[arg(long)]
+    depth: u64,
+    /// Required nonnegative scalar seed; each sample starts the same PCG64 stream
+    #[arg(long)]
+    seed: u128,
 }
 
 #[derive(Args)]
@@ -69,6 +88,15 @@ struct Execution {
     samples: usize,
     nonzeros: usize,
     workers: usize,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    rarefaction: Option<RarefactionParameters>,
+}
+
+#[derive(Serialize)]
+struct RarefactionParameters {
+    depth: u64,
+    seed: String,
+    profile: &'static str,
 }
 
 pub(crate) fn run() -> std::process::ExitCode {
@@ -86,6 +114,7 @@ pub(crate) fn run() -> std::process::ExitCode {
             };
             match cli.command {
                 Command::Alpha(args) => execute(args, workers),
+                Command::Rarefy(args) => execute_rarefy(args, workers),
             }
         },
     )
@@ -177,6 +206,36 @@ fn execute(args: Alpha, workers: usize) -> Result<Execution> {
         samples: counts.sample_ids.len(),
         nonzeros: counts.nonzeros(),
         workers: pool.current_num_threads(),
+        rarefaction: None,
+    })
+}
+
+fn execute_rarefy(args: Rarefy, workers: usize) -> Result<Execution> {
+    if [&args.counts, &args.output]
+        .into_iter()
+        .any(|path| path == Path::new("-"))
+    {
+        return Err(config("counts and output must be named files, not -"));
+    }
+    rsomics_common::reject_output_alias(&args.output, [args.counts.as_path()])?;
+    let mut counts = Counts::read(&args.counts)?;
+    let pool = rayon::ThreadPoolBuilder::new()
+        .num_threads(workers)
+        .build()
+        .map_err(|error| config(format!("creating worker pool: {error}")))?;
+    pool.install(|| rarefy::compute(&mut counts, args.depth, args.seed))?;
+    rsomics_common::write_output(Some(&args.output), |output| counts.write_tsv(output))?;
+    Ok(Execution {
+        output: args.output,
+        features: counts.feature_ids.len(),
+        samples: counts.sample_ids.len(),
+        nonzeros: counts.nonzeros(),
+        workers: pool.current_num_threads(),
+        rarefaction: Some(RarefactionParameters {
+            depth: args.depth,
+            seed: args.seed.to_string(),
+            profile: rarefy::PROFILE,
+        }),
     })
 }
 

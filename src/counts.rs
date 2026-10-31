@@ -1,7 +1,7 @@
 use rsomics_common::{Context, Result, RsomicsError};
 use std::collections::HashSet;
 use std::fs::File;
-use std::io::{BufRead, BufReader};
+use std::io::{BufRead, BufReader, Write};
 use std::path::Path;
 
 const MAX_EXACT_INTEGER: u64 = (1 << 53) - 1;
@@ -113,6 +113,36 @@ impl Counts {
 
     pub fn nonzeros(&self) -> usize {
         self.samples.iter().map(|sample| sample.entries.len()).sum()
+    }
+
+    pub fn write_tsv(&self, output: &mut dyn Write) -> Result<()> {
+        let mut cursors = Vec::new();
+        cursors
+            .try_reserve_exact(self.samples.len())
+            .map_err(|error| {
+                RsomicsError::ConfigError(format!("allocating count-table cursors: {error}"))
+            })?;
+        cursors.resize(self.samples.len(), 0);
+        write!(output, "feature")?;
+        for sample in &self.sample_ids {
+            write!(output, "\t{sample}")?;
+        }
+        writeln!(output)?;
+        for (feature, id) in self.feature_ids.iter().enumerate() {
+            write!(output, "{id}")?;
+            for (sample, cursor) in self.samples.iter().zip(&mut cursors) {
+                let count = match sample.entries.get(*cursor) {
+                    Some(entry) if entry.feature == feature => {
+                        *cursor += 1;
+                        entry.count
+                    }
+                    _ => 0,
+                };
+                write!(output, "\t{count}")?;
+            }
+            writeln!(output)?;
+        }
+        Ok(())
     }
 }
 

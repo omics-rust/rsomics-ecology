@@ -1,12 +1,15 @@
 # rsomics-ecology
 
-Private development of one sparse count-table diversity product. Only the
-complete alpha workflow is implemented here. This is not a stable release:
-the intended first product also needs beta diversity, rarefaction, native
+Private development of one sparse count-table diversity product. Alpha and
+seeded rarefaction workflows are implemented here. This is not a stable
+release: the intended first product also needs beta diversity, native
 four-platform acceptance and representative performance evidence.
 
 ```sh
 rsomics-ecology alpha --counts community.tsv --output alpha.tsv --threads 4
+rsomics-ecology rarefy --counts community.tsv --depth 200 --seed 42 \
+  --output rarefied.tsv --threads 4 --json
+rsomics-ecology alpha --counts rarefied.tsv --output rarefied-alpha.tsv
 rsomics-ecology alpha --counts community.tsv --tree phylogeny.nwk \
   --metrics observed_features,shannon,faith_pd,phydiv \
   --pd-rooted auto --pd-weight 0.25 --format json --output alpha.json --json
@@ -76,6 +79,32 @@ reuse bounded node accumulators and touched-node lists, not an edge-by-sample
 array; reductions within each sample have a fixed order. This layout is a
 memory design, not a measured speed or RSS claim.
 
+## Rarefaction
+
+`rarefy` samples each column without replacement and writes a canonical
+`feature`-headed TSV accepted directly by `alpha`. Both `--depth` and
+`--seed` are required. The seed is a decimal nonnegative scalar `u128`;
+every sample initializes its own same-seed PCG64 stream. Worker scheduling
+does not change the table. The result envelope records depth, decimal seed
+and profile `skbio-0.7.3/biom-2.1.17/numpy-2.5.4-pcg64-choice-shuffle-false`.
+This is a pinned profile, not compatibility with arbitrary NumPy versions,
+seed forms or an omitted seed.
+
+Depth greater than any sample total is an error before writing output.
+Depth zero preserves all feature/sample dimensions and produces zeros,
+including no-feature and all-zero tables. This deliberately fixes the
+captured upstream BIOM empty-data `IndexError`; the success status is not
+claimed to be upstream-compatible. Exact-total sampling retains the input
+counts. All identities and their order are preserved.
+
+Sparse counts remain sample-major. Sorted sampled read positions are mapped
+onto positive feature spans without expanding a repeated-read feature array.
+Floyd selection uses depth-sized storage plus a lookup table. The source's
+large-population/high-depth branch still needs a population-sized `u64`
+tail-shuffle workspace; allocation failure is an error. TSV emission uses
+one cursor per sample, not a second dense matrix. These are storage-design
+properties, not measured throughput or RSS improvements.
+
 ## Output and failures
 
 `--output` is a required named destination. The shared rsomics atomic-output
@@ -83,9 +112,9 @@ contract keeps an existing destination intact on parsing, validation,
 calculation or write failure. Input/output aliases, including hard links,
 are rejected. `--threads` uses the shared nonzero worker control;
 `--json` emits the common command-result envelope to stdout, independently
-of the named data file's `--format tsv|json`.
+of alpha's named data file `--format tsv|json`. Rarefaction always writes TSV.
 
-TSV contains a `sample` header and selected metric columns. Source-unavailable
+Alpha TSV contains a `sample` header and selected metric columns. Source-unavailable
 values are spelled `nan` (`inf`/`-inf` for corresponding nonfinite results).
 JSON schema version 1 retains `feature_ids`, `sample_ids`, `metrics`, effective
 generalized-PD options and sample-major `values`. Each value is an object:
@@ -98,24 +127,29 @@ with reason `empty_community`, matching the qualified source NaN class.
 ## Verification
 
 Run local commands through `bash scripts/guarded-cargo.sh` from this repository.
-The guard is copied unchanged from the owning rsomics-deseq tool and checks
-external Cargo home/resolved target/TMPDIR and boot APFS occupancy before
-execution. It is a local macOS development tool, not a portable installer.
+The guard verifies that Cargo home, resolved target, rustup/toolchain, TMPDIR
+and caches physically remain external before execution. Unrelated boot-disk
+occupancy does not block work. It is a local macOS development tool, not a
+portable installer.
 For formatting, use `--exec` with the pinned toolchain's `cargo-fmt fmt`
 executable directly; `cargo fmt` on this host otherwise selects an
 unconfigured rustup shim. No global default or new installation is required.
 
-Two integrated release tests cover the full multi-alpha file workflow at
-one/four workers and compact invalid/atomic cases. The private, standard-
+Integrated tests cover multi-alpha and rarefaction file workflows at one/four
+workers and compact invalid/atomic cases. Frozen primary, Floyd and tail-
+shuffle expected tables are independent retained source captures, not
+native-generated expectations. The private, standard-
 library-only `scripts/compare_alpha_source.py` compares both original and
 source-rarefied tables across all 15 retained source alpha/PD profiles at
 one/four workers, plus valid zero/root/extra-tip cases. It imports no
 scientific packages and does not rerun or refit the source. Absolute and
 relative bands remain `1e-10` each; identities/order and nonfinite classes
 are exact. Pass `--binary`, `--witness` and a new external `--output` directory.
+Use `--rarefied-counts` to feed an actual native-rarefied primary table into
+the complete alpha/PD comparison after validating it against the capture.
 
-No beta/rarefy command, adapter, fallback or empty future module is present.
-Their pending public boundary decisions are not chosen by this alpha slice.
+No beta command, adapter, fallback or empty future module is present.
+Its pending public boundary decision is not chosen by this extension.
 BIOM import, continuous abundances, ordination, association, inference and
 the historical alpha metrics outside this selection are excluded.
 See [MERGE.md](MERGE.md) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

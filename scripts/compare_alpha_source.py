@@ -60,12 +60,22 @@ def compare(args, report):
         folder = args.output / name
         folder.mkdir()
         counts, tree = folder / 'counts.tsv', folder / 'tree.nwk'
-        with counts.open('w', newline='') as stream:
-            writer = csv.writer(stream, delimiter='\t', lineterminator='\n')
-            writer.writerow(['#OTU ID', *request['sample_ids']])
-            for feature, values in zip(request['feature_ids'], zip(*request['counts'])):
-                assert all(type(value) is int and value >= 0 for value in values)
-                writer.writerow([feature, *values])
+        if name == 'rarefied' and args.rarefied_counts is not None:
+            counts = args.rarefied_counts
+            with counts.open(newline='') as stream:
+                rows = list(csv.reader(stream, delimiter='\t'))
+            assert rows[0][0] in ('feature', '#OTU ID')
+            assert rows[0][1:] == request['sample_ids']
+            assert [row[0] for row in rows[1:]] == request['feature_ids']
+            assert [[int(value) for value in row[1:]] for row in rows[1:]] == list(map(list, zip(*request['counts'])))
+            report['native_rarefied_counts'] = {'path': str(counts), 'sha256': sha256(counts)}
+        else:
+            with counts.open('w', newline='') as stream:
+                writer = csv.writer(stream, delimiter='\t', lineterminator='\n')
+                writer.writerow(['#OTU ID', *request['sample_ids']])
+                for feature, values in zip(request['feature_ids'], zip(*request['counts'])):
+                    assert all(type(value) is int and value >= 0 for value in values)
+                    writer.writerow([feature, *values])
         tree.write_text(request['tree'])
         expected = {}
         for metric in witness['alpha_metrics'] + ['faith_pd'] + ['phydiv-' + profile[0] for profile in witness['phydiv_profiles']]:
@@ -128,6 +138,8 @@ def compare(args, report):
                 native_reports.append(actual)
             assert native_reports[0] == native_reports[1], (name, profile, 'worker-dependent result')
     assert sha256(args.binary) == report['binary']['sha256'], 'native executable changed during comparison'
+    if args.rarefied_counts is not None:
+        assert sha256(args.rarefied_counts) == report['native_rarefied_counts']['sha256'], 'native rarefied table changed during comparison'
 
 
 def main():
@@ -136,10 +148,14 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--binary', type=Path, required=True)
     parser.add_argument('--witness', type=Path, required=True)
+    parser.add_argument('--rarefied-counts', type=Path,
+                        help='native-rarefied primary table, checked against the retained source input')
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     args.binary = args.binary.resolve(strict=True)
     args.witness = args.witness.resolve(strict=True)
+    if args.rarefied_counts is not None:
+        args.rarefied_counts = args.rarefied_counts.resolve(strict=True)
     args.output.mkdir(parents=True, exist_ok=False)
     report = dict(status='failed', scope='retained source alpha comparison only; not a source replay, benchmark or release gate',
                   python=sys.version, machine=platform.platform(), runs=[], compared_values=0,
