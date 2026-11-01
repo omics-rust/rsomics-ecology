@@ -5,14 +5,15 @@ and eight beta modes. The supported interface is one executable using the
 shared rsomics help, worker, result-envelope and atomic-output contracts.
 
 The implementation has accepted full-study alpha/rarefaction and all eight
-beta comparisons plus four-native-platform tests. Native/source installation
-archives are being qualified separately; see [CI](https://github.com/omics-rust/rsomics-ecology/actions)
-and [Releases](https://github.com/omics-rust/rsomics-ecology/releases).
+beta comparisons plus four-native-platform tests. The [0.1.0 release](https://github.com/omics-rust/rsomics-ecology/releases/tag/v0.1.0)
+provides native Linux/macOS x86_64/aarch64 archives, checksums and a complete
+locked source package. Clean source installation and the full installed
+workflow pass on all four native platforms; see [CI](https://github.com/omics-rust/rsomics-ecology/actions/runs/41341218191).
 The crate is not published to crates.io; `publish = false` remains intentional.
 
 ## Installation
 
-Once a GitHub release is listed, select its `linux-x86_64`, `linux-aarch64`,
+Select the release's `linux-x86_64`, `linux-aarch64`,
 `macos-x86_64` or `macos-aarch64` archive, verify it against the release's
 `SHA256SUMS`, and extract it. Run the enclosed `rsomics-ecology` executable;
 the other files retain project and dependency notices. Candidates are unsigned
@@ -255,9 +256,9 @@ claim is made. Delivery executables are not remeasured or assigned old timings.
 Those records and `ecology-native-beta-2026-11-01.json` live in
 [rsomics-world](https://github.com/omics-rust/rsomics-world/tree/main/.autopilot/oracles).
 The older compact native receipt does not qualify a dedicated source-on-native
-gate; the accepted full-study comparisons are separate evidence. Public
-installation/source-package acceptance and registry publication also remain
-separate gates.
+gate; the accepted full-study comparisons are separate evidence. The qualified
+GitHub installation/source package is also separate from the held registry
+publication; no new timing is assigned to its executables.
 
 BIOM import, continuous abundances, ordination, association, inference and
 the historical alpha metrics outside this selection are excluded.
