@@ -1,15 +1,19 @@
 # rsomics-ecology
 
-Private development of one sparse count-table diversity product. Alpha and
-seeded rarefaction workflows are implemented here. This is not a stable
-release: the intended first product also needs beta diversity, native
-four-platform acceptance and representative performance evidence.
+Private development of one sparse count-table diversity product. Alpha,
+seeded rarefaction and eight beta modes are implemented here. This is not a
+stable release: beta still needs full-study qualification/performance and
+the candidate needs native four-platform acceptance and independent review.
 
 ```sh
 rsomics-ecology alpha --counts community.tsv --output alpha.tsv --threads 4
 rsomics-ecology rarefy --counts community.tsv --depth 200 --seed 42 \
   --output rarefied.tsv --threads 4 --json
 rsomics-ecology alpha --counts rarefied.tsv --output rarefied-alpha.tsv
+rsomics-ecology beta --counts rarefied.tsv --metric braycurtis \
+  --output braycurtis.tsv --threads 4
+rsomics-ecology beta --counts community.tsv --tree phylogeny.nwk \
+  --metric weighted_normalized_unifrac --format json --output unifrac.json
 rsomics-ecology alpha --counts community.tsv --tree phylogeny.nwk \
   --metrics observed_features,shannon,faith_pd,phydiv \
   --pd-rooted auto --pd-weight 0.25 --format json --output alpha.json --json
@@ -79,10 +83,53 @@ reuse bounded node accumulators and touched-node lists, not an edge-by-sample
 array; reductions within each sample have a fixed order. This layout is a
 memory design, not a measured speed or RSS claim.
 
+## Beta diversity
+
+`beta` requires exactly one `--metric`: `braycurtis`, `jaccard`, `euclidean`,
+`canberra`, `cityblock`, `unweighted_unifrac`, `weighted_unifrac` or
+`weighted_normalized_unifrac`. `--tree` is required exactly for the three
+UniFrac metrics, which share Faith's source root-degree<=2 rule. Unary roots,
+additional tips and stored root lengths are preserved. The normalized name
+maps to source `weighted_unifrac(normalized=True)`; ordinary weighted UniFrac
+uses the source's unnormalized default. No `all`, aliases or root switch.
+
+Nonphylogenetic modes use raw counts, except Jaccard uses presence/absence.
+Sparse feature lists are merged directly. UniFrac prepares occupied branches
+once per sample through the same accumulation used by alpha, with bounded
+per-worker dense workspaces and shared postorder/lengths. Pair kernels merge
+sparse branches. Normalized correction multiplies tip-root lengths by the
+pair's summed proportions in that same merge. Shared all-tree path state
+preserves nonfinite correction errors for unoccupied/extra infinite tips or
+infinite internal masked paths, without rejecting defined infinite-denominator
+results. No per-sample
+correction-mass cache changes subnormal rounding or nonfinite classification.
+The output has one checked/fallibly allocated square buffer; workers write
+disjoint upper rows, select the first failing index pair
+deterministically, then mirror only after success. JSON borrows matrix rows.
+There is no full pair list or dense sample-by-full-tree array. Sparse branch
+storage can still grow to the occupied sample-by-tree worst case; none of
+these design choices establishes performance or RSS superiority.
+
+Each invocation writes one complete finite labelled matrix. Zero-feature
+input yields zeros in every mode after strict input/tree validation. Jaccard
+empty union, Canberra double-zero coordinates, unweighted UniFrac zero branch
+denominator and normalized double-empty samples are defined0. Bray-Curtis
+with features and two empty samples is undefined. Normalized weighted
+UniFrac with nonempty counts but zero tip-root correction is undefined,
+including identical positive samples on zero-length paths. Only distinct
+pairs are evaluated; diagonals are0. Undefined/nonfinite pairs fail with
+metric and both sample IDs before replacing output, not NaN-to-zero.
+
+TSV starts with an empty header cell and exact ordered sample labels; finite
+numbers round-trip. Numeric source compatibility does not promise Python
+float-repr byte identity. JSON schema1 records `metric`, `source_profile`,
+`tree_profile`, `sample_ids` and row-major `values`, with no null/nonfinite
+cells. The result envelope records metric/source/tree provenance separately.
+
 ## Rarefaction
 
 `rarefy` samples each column without replacement and writes a canonical
-`feature`-headed TSV accepted directly by `alpha`. Both `--depth` and
+`feature`-headed TSV accepted directly by `alpha` and `beta`. Both `--depth` and
 `--seed` are required. The seed is a decimal nonnegative scalar `u128`;
 every sample initializes its own same-seed PCG64 stream. Worker scheduling
 does not change the table. The result envelope records depth, decimal seed
@@ -112,7 +159,7 @@ contract keeps an existing destination intact on parsing, validation,
 calculation or write failure. Input/output aliases, including hard links,
 are rejected. `--threads` uses the shared nonzero worker control;
 `--json` emits the common command-result envelope to stdout, independently
-of alpha's named data file `--format tsv|json`. Rarefaction always writes TSV.
+of alpha/beta's named data file `--format tsv|json`. Rarefaction always writes TSV.
 
 Alpha TSV contains a `sample` header and selected metric columns. Source-unavailable
 values are spelled `nan` (`inf`/`-inf` for corresponding nonfinite results).
@@ -148,8 +195,19 @@ are exact. Pass `--binary`, `--witness` and a new external `--output` directory.
 Use `--rarefied-counts` to feed an actual native-rarefied primary table into
 the complete alpha/PD comparison after validating it against the capture.
 
-No beta command, adapter, fallback or empty future module is present.
-Its pending public boundary decision is not chosen by this extension.
+The integrated beta workflow uses original40634594900 frozen source data,
+then actual depth8/seed42 rarefaction and reload, for all eight modes plus
+alpha/PD at native1/4. Compact boundaries retain source NaNs separately from
+native expected errors. `scripts/compare_beta_source.py` accepts `--binary`,
+`--witness` and a new external `--output` directory and verifies frozen-file
+hashes, source identities/domain, round-trip TSV/JSON and native1/4 bytes at
+the same fixed1e-10 bands. It uses only Python's standard library and does
+not run an upstream oracle. See `tests/data/beta/PROVENANCE.md`.
+
+The control-plane receipt `.autopilot/oracles/ecology-whole-real-2026-11-01.json`
+accepts only the baseline11-alpha/rarefaction/alpha full-study profile, not
+these new beta modes. Beta full-study correctness/performance and native
+four-platform candidate acceptance remain separate gates.
 BIOM import, continuous abundances, ordination, association, inference and
 the historical alpha metrics outside this selection are excluded.
 See [MERGE.md](MERGE.md) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

@@ -1,5 +1,7 @@
 use crate::alpha::{self, Metric};
+use crate::beta;
 use crate::counts::Counts;
+use crate::distance::{SOURCE_PROFILE, TREE_PROFILE};
 use crate::phylogeny::{PreparedPhylogeny, RootMode};
 use crate::rarefy;
 use clap::{Args, Parser, Subcommand, ValueEnum};
@@ -30,8 +32,29 @@ struct Cli {
 enum Command {
     /// Compute selected per-sample alpha diversity metrics in one pass
     Alpha(Alpha),
+    /// Compute one complete finite labelled between-sample distance matrix
+    Beta(Beta),
     /// Subsample each count-table sample without replacement
     Rarefy(Rarefy),
+}
+
+#[derive(Args)]
+struct Beta {
+    /// Feature-by-sample integer TSV with feature or #OTU ID first header
+    #[arg(long, value_name = "TSV")]
+    counts: PathBuf,
+    /// Named destination; replaced atomically after successful analysis
+    #[arg(long, value_name = "PATH")]
+    output: PathBuf,
+    /// Required selected distance; no normalization except as named
+    #[arg(long, value_enum)]
+    metric: beta::Metric,
+    /// Newick phylogeny; required exactly for the three UniFrac metrics
+    #[arg(long, value_name = "NEWICK")]
+    tree: Option<PathBuf>,
+    /// Labelled finite matrix file format
+    #[arg(long, value_enum, default_value = "tsv")]
+    format: Format,
 }
 
 #[derive(Args)]
@@ -90,6 +113,16 @@ struct Execution {
     workers: usize,
     #[serde(skip_serializing_if = "Option::is_none")]
     rarefaction: Option<RarefactionParameters>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    beta: Option<BetaParameters>,
+}
+
+#[derive(Serialize)]
+struct BetaParameters {
+    metric: beta::Metric,
+    source_profile: &'static str,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    tree_profile: Option<&'static str>,
 }
 
 #[derive(Serialize)]
@@ -114,6 +147,7 @@ pub(crate) fn run() -> std::process::ExitCode {
             };
             match cli.command {
                 Command::Alpha(args) => execute(args, workers),
+                Command::Beta(args) => execute_beta(args, workers),
                 Command::Rarefy(args) => execute_rarefy(args, workers),
             }
         },
@@ -207,6 +241,7 @@ fn execute(args: Alpha, workers: usize) -> Result<Execution> {
         nonzeros: counts.nonzeros(),
         workers: pool.current_num_threads(),
         rarefaction: None,
+        beta: None,
     })
 }
 
@@ -235,6 +270,73 @@ fn execute_rarefy(args: Rarefy, workers: usize) -> Result<Execution> {
             depth: args.depth,
             seed: args.seed.to_string(),
             profile: rarefy::PROFILE,
+        }),
+        beta: None,
+    })
+}
+
+fn execute_beta(args: Beta, workers: usize) -> Result<Execution> {
+    for path in [
+        Some(args.counts.as_path()),
+        Some(args.output.as_path()),
+        args.tree.as_deref(),
+    ]
+    .into_iter()
+    .flatten()
+    {
+        if path == Path::new("-") {
+            return Err(config("counts, tree and output must be named files, not -"));
+        }
+    }
+    rsomics_common::reject_output_alias(
+        &args.output,
+        [Some(args.counts.as_path()), args.tree.as_deref()]
+            .into_iter()
+            .flatten(),
+    )?;
+    if args.metric.phylogenetic() != args.tree.is_some() {
+        return Err(config(
+            "--tree is required exactly when selecting a UniFrac metric",
+        ));
+    }
+    let counts = Counts::read(&args.counts)?;
+    let tree = args
+        .tree
+        .as_deref()
+        .map(|path| PreparedPhylogeny::read(path, &counts.feature_ids, true))
+        .transpose()?;
+    let pool = rayon::ThreadPoolBuilder::new()
+        .num_threads(workers)
+        .build()
+        .map_err(|error| config(format!("creating worker pool: {error}")))?;
+    let report = pool.install(|| beta::compute(&counts, args.metric, tree.as_ref()))?;
+    rsomics_common::write_output(Some(&args.output), |output| {
+        match args.format {
+            Format::Tsv => report.write_tsv(output)?,
+            Format::Json => {
+                serde_json::to_writer_pretty(&mut *output, &report).map_err(|error| {
+                    if error.is_io() {
+                        RsomicsError::Io(error.into())
+                    } else {
+                        config(error.to_string())
+                    }
+                })?;
+                writeln!(output)?;
+            }
+        }
+        Ok(())
+    })?;
+    Ok(Execution {
+        output: args.output,
+        features: counts.feature_ids.len(),
+        samples: counts.sample_ids.len(),
+        nonzeros: counts.nonzeros(),
+        workers: pool.current_num_threads(),
+        rarefaction: None,
+        beta: Some(BetaParameters {
+            metric: args.metric,
+            source_profile: SOURCE_PROFILE,
+            tree_profile: args.metric.phylogenetic().then_some(TREE_PROFILE),
         }),
     })
 }

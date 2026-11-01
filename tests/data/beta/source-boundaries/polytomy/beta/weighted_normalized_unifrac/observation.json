@@ -1,0 +1,10 @@
+{
+  "status": "raised",
+  "exception": {
+    "type": "ValueError",
+    "module": "builtins",
+    "message": "The tree must be rooted.",
+    "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/rsomics-world/rsomics-world/scripts/ecology_diversity_oracle.py\", line 148, in observe\n    result = dict(status='returned', result=encode(callback()))\n                                                   ^^^^^^^^^^\n  File \"/home/runner/work/rsomics-world/rsomics-world/scripts/ecology_diversity_oracle.py\", line 283, in <lambda>\n    beta_diversity(metric, counts, ids=samples, **options)), required)\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/_temp/ecology-python/lib/python3.12/site-packages/skbio/diversity/_driver.py\", line 316, in beta_diversity\n    metric, counts = _setup_multiple_weighted_unifrac(\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/_temp/ecology-python/lib/python3.12/site-packages/skbio/diversity/beta/_unifrac.py\", line 550, in _setup_multiple_weighted_unifrac\n    counts_by_node, tree_index, branch_lengths = _setup_multiple_unifrac(\n                                                 ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/_temp/ecology-python/lib/python3.12/site-packages/skbio/diversity/beta/_unifrac.py\", line 476, in _setup_multiple_unifrac\n    _validate_taxa_and_tree(taxa, tree, rooted=True, lengths=True)\n  File \"/home/runner/work/_temp/ecology-python/lib/python3.12/site-packages/skbio/tree/_utils.py\", line 71, in _validate_taxa_and_tree\n    raise ValueError(\"The tree must be rooted.\")\nValueError: The tree must be rooted.\n"
+  },
+  "warnings": []
+}

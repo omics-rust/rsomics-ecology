@@ -1,0 +1,26 @@
+{
+  "status": "returned",
+  "result": {
+    "kind": "distance-matrix",
+    "ids": [
+      "a",
+      "b"
+    ],
+    "values": [
+      [
+        0.0,
+        0.3333333333333333
+      ],
+      [
+        0.3333333333333333,
+        0.0
+      ]
+    ],
+    "shape": [
+      2,
+      2
+    ],
+    "dtype": "float64"
+  },
+  "warnings": []
+}

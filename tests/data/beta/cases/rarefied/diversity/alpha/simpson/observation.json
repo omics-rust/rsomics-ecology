@@ -1,0 +1,25 @@
+{
+  "status": "returned",
+  "result": {
+    "kind": "series",
+    "ids": [
+      "S1",
+      "S2",
+      "S3",
+      "S4",
+      "S5",
+      "S6"
+    ],
+    "values": [
+      0.75,
+      0.8125,
+      0.8125,
+      0.8125,
+      0.8125,
+      0.78125
+    ],
+    "dtype": "float64",
+    "name": null
+  },
+  "warnings": []
+}

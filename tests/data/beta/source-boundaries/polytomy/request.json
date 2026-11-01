@@ -1,0 +1,26 @@
+{
+  "feature_ids": [
+    "U1",
+    "U2",
+    "U3"
+  ],
+  "sample_ids": [
+    "a",
+    "b"
+  ],
+  "counts": [
+    [
+      1,
+      0,
+      2
+    ],
+    [
+      0,
+      3,
+      1
+    ]
+  ],
+  "tree": "(U1:1,U2:2,U3:3)root;",
+  "input_orientation": "sample-by-feature for the source public drivers",
+  "required_return": false
+}

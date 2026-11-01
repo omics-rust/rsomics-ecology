@@ -1,0 +1,221 @@
+{
+  "status": "returned",
+  "result": {
+    "kind": "distance-matrix",
+    "ids": [
+      "S1",
+      "S2",
+      "S3",
+      "S4",
+      "S5",
+      "S6"
+    ],
+    "values": [
+      [
+        0.0,
+        {
+          "nonfinite": "nan"
+        },
+        {
+          "nonfinite": "nan"
+        },
+        {
+          "nonfinite": "nan"
+        },
+        {
+          "nonfinite": "nan"
+        },
+        {
+          "nonfinite": "nan"
+        }
+      ],
+      [
+        {
+          "nonfinite": "nan"
+        },
+        0.0,
+        {
+          "nonfinite": "nan"
+        },
+        {
+          "nonfinite": "nan"
+        },
+        {
+          "nonfinite": "nan"
+        },
+        {
+          "nonfinite": "nan"
+        }
+      ],
+      [
+        {
+          "nonfinite": "nan"
+        },
+        {
+          "nonfinite": "nan"
+        },
+        0.0,
+        {
+          "nonfinite": "nan"
+        },
+        {
+          "nonfinite": "nan"
+        },
+        {
+          "nonfinite": "nan"
+        }
+      ],
+      [
+        {
+          "nonfinite": "nan"
+        },
+        {
+          "nonfinite": "nan"
+        },
+        {
+          "nonfinite": "nan"
+        },
+        0.0,
+        {
+          "nonfinite": "nan"
+        },
+        {
+          "nonfinite": "nan"
+        }
+      ],
+      [
+        {
+          "nonfinite": "nan"
+        },
+        {
+          "nonfinite": "nan"
+        },
+        {
+          "nonfinite": "nan"
+        },
+        {
+          "nonfinite": "nan"
+        },
+        0.0,
+        {
+          "nonfinite": "nan"
+        }
+      ],
+      [
+        {
+          "nonfinite": "nan"
+        },
+        {
+          "nonfinite": "nan"
+        },
+        {
+          "nonfinite": "nan"
+        },
+        {
+          "nonfinite": "nan"
+        },
+        {
+          "nonfinite": "nan"
+        },
+        0.0
+      ]
+    ],
+    "shape": [
+      6,
+      6
+    ],
+    "dtype": "float64"
+  },
+  "warnings": [
+    {
+      "type": "RuntimeWarning",
+      "message": "invalid value encountered in scalar divide",
+      "filename": "/home/runner/work/_temp/ecology-python/lib/python3.12/site-packages/skbio/diversity/beta/_unifrac.py",
+      "lineno": 471
+    },
+    {
+      "type": "RuntimeWarning",
+      "message": "invalid value encountered in scalar divide",
+      "filename": "/home/runner/work/_temp/ecology-python/lib/python3.12/site-packages/skbio/diversity/beta/_unifrac.py",
+      "lineno": 471
+    },
+    {
+      "type": "RuntimeWarning",
+      "message": "invalid value encountered in scalar divide",
+      "filename": "/home/runner/work/_temp/ecology-python/lib/python3.12/site-packages/skbio/diversity/beta/_unifrac.py",
+      "lineno": 471
+    },
+    {
+      "type": "RuntimeWarning",
+      "message": "invalid value encountered in scalar divide",
+      "filename": "/home/runner/work/_temp/ecology-python/lib/python3.12/site-packages/skbio/diversity/beta/_unifrac.py",
+      "lineno": 471
+    },
+    {
+      "type": "RuntimeWarning",
+      "message": "invalid value encountered in scalar divide",
+      "filename": "/home/runner/work/_temp/ecology-python/lib/python3.12/site-packages/skbio/diversity/beta/_unifrac.py",
+      "lineno": 471
+    },
+    {
+      "type": "RuntimeWarning",
+      "message": "invalid value encountered in scalar divide",
+      "filename": "/home/runner/work/_temp/ecology-python/lib/python3.12/site-packages/skbio/diversity/beta/_unifrac.py",
+      "lineno": 471
+    },
+    {
+      "type": "RuntimeWarning",
+      "message": "invalid value encountered in scalar divide",
+      "filename": "/home/runner/work/_temp/ecology-python/lib/python3.12/site-packages/skbio/diversity/beta/_unifrac.py",
+      "lineno": 471
+    },
+    {
+      "type": "RuntimeWarning",
+      "message": "invalid value encountered in scalar divide",
+      "filename": "/home/runner/work/_temp/ecology-python/lib/python3.12/site-packages/skbio/diversity/beta/_unifrac.py",
+      "lineno": 471
+    },
+    {
+      "type": "RuntimeWarning",
+      "message": "invalid value encountered in scalar divide",
+      "filename": "/home/runner/work/_temp/ecology-python/lib/python3.12/site-packages/skbio/diversity/beta/_unifrac.py",
+      "lineno": 471
+    },
+    {
+      "type": "RuntimeWarning",
+      "message": "invalid value encountered in scalar divide",
+      "filename": "/home/runner/work/_temp/ecology-python/lib/python3.12/site-packages/skbio/diversity/beta/_unifrac.py",
+      "lineno": 471
+    },
+    {
+      "type": "RuntimeWarning",
+      "message": "invalid value encountered in scalar divide",
+      "filename": "/home/runner/work/_temp/ecology-python/lib/python3.12/site-packages/skbio/diversity/beta/_unifrac.py",
+      "lineno": 471
+    },
+    {
+      "type": "RuntimeWarning",
+      "message": "invalid value encountered in scalar divide",
+      "filename": "/home/runner/work/_temp/ecology-python/lib/python3.12/site-packages/skbio/diversity/beta/_unifrac.py",
+      "lineno": 471
+    },
+    {
+      "type": "RuntimeWarning",
+      "message": "invalid value encountered in scalar divide",
+      "filename": "/home/runner/work/_temp/ecology-python/lib/python3.12/site-packages/skbio/diversity/beta/_unifrac.py",
+      "lineno": 471
+    },
+    {
+      "type": "RuntimeWarning",
+      "message": "invalid value encountered in scalar divide",
+      "filename": "/home/runner/work/_temp/ecology-python/lib/python3.12/site-packages/skbio/diversity/beta/_unifrac.py",
+      "lineno": 471
+    },
+    {
+      "type": "RuntimeWarning",
+      "message": "invalid value encountered in scalar divide",
+      "filename": "/home/runner/work/_temp/ecology-python/lib/python3.12/site-packages/skbio/diversity/beta/_unifrac.py",
+      "lineno": 471
+    }
+  ]
+}

@@ -1,8 +1,10 @@
 #![forbid(unsafe_code)]
 
 mod alpha;
+mod beta;
 mod cli;
 mod counts;
+mod distance;
 mod phylogeny;
 mod rarefy;
 mod rng;
