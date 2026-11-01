@@ -36,6 +36,9 @@ Applicable notices and terms are retained without changing upstream terms:
 The original team-owned Rust assets and this product's original code use
 MIT OR Apache-2.0 terms, reproduced in LICENSE-MIT and LICENSE-APACHE-2.0.
 The notices above apply to their respective adapted portions. Registry
-dependencies retain their own licenses. No upstream endorsement is implied.
+dependencies retain their own licenses. Their enabled normal/build target
+inventory and original terms are retained in `THIRD_PARTY_LICENSES.md` and
+`licenses/provenance.json`; binary archives include that directory together
+with the adapted-code terms above. No upstream endorsement is implied.
 Fixture provenance is recorded in `tests/data/rarefaction/PROVENANCE.md` and
 `tests/data/beta/PROVENANCE.md`.

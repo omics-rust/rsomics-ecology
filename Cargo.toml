@@ -5,7 +5,11 @@ edition = "2024"
 rust-version = "1.91"
 publish = false
 license = "MIT OR Apache-2.0"
-description = "Private development of sparse count-table ecological diversity workflows"
+description = "Sparse count-table ecological diversity workflows"
+repository = "https://github.com/omics-rust/rsomics-ecology"
+homepage = "https://github.com/omics-rust/rsomics-ecology"
+keywords = ["bioinformatics", "ecology", "diversity", "unifrac", "rarefaction"]
+categories = ["science", "command-line-utilities"]
 authors = ["Zane Leong <efd@live.com>"]
 readme = "README.md"
 

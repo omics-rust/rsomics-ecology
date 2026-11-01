@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 export CARGO_HOME=/Volumes/KIOXIA/Developments/cargo-home
-export CARGO_TARGET_DIR=/Volumes/KIOXIA/Developments/cargo-target
+export CARGO_TARGET_DIR=/Volumes/KIOXIA/Developments/cargo-target/rsomics-ecology
 export TMPDIR=/Volumes/KIOXIA/Developments/tmp
 export RUSTUP_HOME=/Volumes/KIOXIA/Developments/rustup-home
 export XDG_CACHE_HOME=/Volumes/KIOXIA/Developments/tmp/cache

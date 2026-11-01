@@ -1,9 +1,32 @@
 # rsomics-ecology
 
-Private development of one sparse count-table diversity product. Alpha,
-seeded rarefaction and eight beta modes are implemented here. This is not a
-stable release: beta still needs full-study qualification/performance and
-the candidate needs native four-platform acceptance and independent review.
+One sparse count-table diversity product:11 alpha metrics, seeded rarefaction
+and eight beta modes. The supported interface is one executable using the
+shared rsomics help, worker, result-envelope and atomic-output contracts.
+
+The implementation has accepted full-study alpha/rarefaction and all eight
+beta comparisons plus four-native-platform tests. Native/source installation
+archives are being qualified separately; see [CI](https://github.com/omics-rust/rsomics-ecology/actions)
+and [Releases](https://github.com/omics-rust/rsomics-ecology/releases).
+The crate is not published to crates.io; `publish = false` remains intentional.
+
+## Installation
+
+Once a GitHub release is listed, select its `linux-x86_64`, `linux-aarch64`,
+`macos-x86_64` or `macos-aarch64` archive, verify it against the release's
+`SHA256SUMS`, and extract it. Run the enclosed `rsomics-ecology` executable;
+the other files retain project and dependency notices. Candidates are unsigned
+and not notarized. Linux archives use GNU libc, not musl.
+
+To build from a complete GitHub source package or source checkout with Rust1.91
+or newer, enter its extracted root and run:
+
+```sh
+cargo install --path . --locked
+rsomics-ecology --help
+```
+
+## Quick start
 
 ```sh
 rsomics-ecology alpha --counts community.tsv --output alpha.tsv --threads 4
@@ -19,9 +42,9 @@ rsomics-ecology alpha --counts community.tsv --tree phylogeny.nwk \
   --pd-rooted auto --pd-weight 0.25 --format json --output alpha.json --json
 ```
 
-The executable is the supported interface. The library exposes only
-`run_cli`; count models, tree preparation and compute functions are private.
-`publish = false` is intentional. No remote repository is configured.
+The library exposes only `run_cli`; count models, tree preparation and compute
+functions remain private. This release slice does not promise a scientific
+Rust library API.
 
 ## Input
 
@@ -204,10 +227,39 @@ hashes, source identities/domain, round-trip TSV/JSON and native1/4 bytes at
 the same fixed1e-10 bands. It uses only Python's standard library and does
 not run an upstream oracle. See `tests/data/beta/PROVENANCE.md`.
 
-The control-plane receipt `.autopilot/oracles/ecology-whole-real-2026-11-01.json`
-accepts only the baseline11-alpha/rarefaction/alpha full-study profile, not
-these new beta modes. Beta full-study correctness/performance and native
-four-platform candidate acceptance remain separate gates.
+Owning CI runs the six complete integrations in debug, release and packaged
+release on actual Linux/macOS x86_64/aarch64 hosts, then installs the complete
+Cargo source package and exercises the installed rarefy/11-alpha/eight-beta
+lifecycle. Original CLI outputs and package/notice identities are retained in
+delivery artifacts. Retained source observations are data fixtures; this is
+not a new live upstream execution on each platform.
+
+## Qualified performance and scope
+
+The control-plane receipt `ecology-whole-real-2026-11-01.json` accepts the
+baseline11-alpha/depth3-rarefaction/alpha profile on the complete41,328-feature,
+1,105-sample study. It binds implementation `e1b03cb6` and measured executable
+`58cd2ec1`, not a timing of newly packaged binaries. Its one/four-worker gates
+pass, but native worker scaling is limited.
+
+`ecology-beta-eight-real-2026-11-02.json` accepts separate full-study upstream
+comparisons and serial throughput/RSS gates for all eight beta modes at
+implementation `111adf5e`, measured Linux executable `d7dc1832`. Each uses the
+same complete study and the three UniFrac modes retain the full162,331-tip
+tree. The UniFrac source baseline is the declared contiguous-public layout;
+the2,858,608,480-byte layout copy is charged. It is not unchanged-default source
+memory. Metrics ran on different actual hosts, so their times are not summed.
+Four-worker CPU, faults and RSS costs remain recorded; no universal scaling
+claim is made. Delivery executables are not remeasured or assigned old timings.
+
+Those records and `ecology-native-beta-2026-11-01.json` live in
+[rsomics-world](https://github.com/omics-rust/rsomics-world/tree/main/.autopilot/oracles).
+The older compact native receipt does not qualify a dedicated source-on-native
+gate; the accepted full-study comparisons are separate evidence. Public
+installation/source-package acceptance and registry publication also remain
+separate gates.
+
 BIOM import, continuous abundances, ordination, association, inference and
 the historical alpha metrics outside this selection are excluded.
-See [MERGE.md](MERGE.md) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+See [MERGE.md](MERGE.md), [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and
+[THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).

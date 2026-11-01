@@ -1,9 +1,9 @@
 # Ecology implementation provenance
 
-This is one private development slice of the planned ecology alpha/beta/
-rarefaction product, not a revived micro-crate or a complete product release.
-No Git history has been imported, rewritten or committed by this task. The
-following clean team-owned source assets were inspected at their exact heads.
+This is the alpha/beta/rarefaction slice of one community-ecology product,
+not a revived micro-crate or the full planned ecology operation surface.
+The following clean team-owned source assets were inspected at their exact
+heads. Their implementation provenance remains separate from delivery changes.
 
 | Historical asset and commit | Classification and use |
 |---|---|
@@ -112,7 +112,7 @@ not an independent raw RNG-stream witness. The alpha comparator can consume
 the native-rarefied primary table with unchanged expected values and bands.
 No scientific source rerun, seed search or sampling-parameter tuning is used.
 
-## Remaining product gates
+## Accepted implementation and remaining delivery gates
 
 The separately qualified real community study (41,328 features / 1,105 samples /
 314,497 nonzeros) motivated sparse storage. Its raw files are not modified or
@@ -121,7 +121,23 @@ The control plane adopted the baseline11-alpha/rarefaction/alpha real-study
 receipt `.autopilot/oracles/ecology-whole-real-2026-11-01.json`, SHA256
 `179835de584fe258fcf62859565203d2d0c4742c27fe32c0636015341c7bd3b7`.
 That receipt does not accept beta, and its timing/scaling is not beta evidence.
-The new beta wave still needs full-study correctness and its own per-metric/
-suite performance gates, one whole-feature independent review and native
-Linux/macOS x86_64/aarch64 candidate tests before stable/public release. `publish = false`
-remains in force. No registry name, remote repository or publication is created.
+The beta candidate at111adf5e has reviewed whole-feature implementation and
+four-native Linux/macOS x86_64/aarch64 tests in actual41280935272. Receipt
+`ecology-beta-eight-real-2026-11-02.json` separately accepts all eight full-input
+beta comparisons and serial throughput/RSS gates from actual41288208209/1,
+with normalized UniFrac completed in the single failed-initialization retry
+attempt2. The source-on-native flag of the compact native receipt remains
+false; these independent full-study comparisons do not rewrite it.
+
+The beta performance executable is d7dc1832 at111adf5e. The earlier
+alpha/rarefaction executable is58cd2ec1 ate1b03cb6. Neither is relabelled as a
+new delivery binary. Full native worker CPU/RSS/fault costs and the adapted
+contiguous-public UniFrac source baseline remain explicit in those records.
+
+One delivery-only candidate adds complete Cargo source/native installation,
+locked registry notices and an installed rarefy/alpha/eight-beta lifecycle.
+Scientific Rust, lock, tests, observations and these adapted-upstream terms
+remain unchanged; only the CLI private-development suffix is removed.
+Exact-head owning CI, original package adoption and actual public installation
+are release gates. `publish = false` and the registry hold remain in force;
+no crates.io publication is claimed.

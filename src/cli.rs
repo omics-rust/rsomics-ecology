@@ -16,7 +16,7 @@ const DEFAULT_METRICS: &str = "observed_features,shannon,simpson,dominance,inv_s
 #[command(
     name = "rsomics-ecology",
     version,
-    about = "Sparse count-table ecological diversity (private development)",
+    about = "Sparse count-table ecological diversity",
     arg_required_else_help = true
 )]
 struct Cli {
